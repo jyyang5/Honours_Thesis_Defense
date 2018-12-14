@@ -55,7 +55,7 @@
 
 % Here's where the presentation starts, with the info for the title slide
 \title{Design of a surrogate model assisted $(\mu/\mu,\lambda)$-ES}
-\subtitle{Honours Thesis}
+\subtitle{Honours Thesis supervised by Dr. Dirk V. Arnold}
 
 \author{Jingyun Yang}
 \institute{Faculty of Computer Science\\ Dalhousie University\\ jingyun.yang@dal.ca}
@@ -143,7 +143,7 @@
 \begin{frame}{2.1.1 Evolution Strategy}
 \begin{itemize}
     \item \textbf{Mutation}  
-    Generate standard normally distributed 
+    % Generate standard normally distributed 
     \item \textbf{Recombination}
     
     \item \textbf{Selection} 
@@ -161,20 +161,20 @@
         \STATE Evaluate $X^{(1)}$ using $f$, yielding $fX^{(1)} \leftarrow \{ f(x_i^{(1)}): i=1,2,...,\mu \}$
         \WHILE{not terminate()} 
         	\FOR{$i=1,2,...,\lambda$}
-        		\STATE {Generate standard normally distributed $z_i^{(g)} \in \mathbb{R}^N $}                
-        	        \hfill$\blacktriangleright$\Comment{Mutation} % comment
+        		\STATE {Generate standard normally distributed $z_i^{(g)} \in \mathbb{R}^N $}         
+        	    \hfill$\blacktriangleright$\Comment{Mutation} % comment
         		\STATE $x_{\text{centroid}[i]}^{(g)} \leftarrow  recombine (select\_random (\rho,X^{(g)}))$  
         		    \hfill$\blacktriangleright$\Comment{Recombination} % comment
-        		\STATE $y_i^{(g)} \leftarrow x_{\text{centroid}[i]}^{(g)} + \sigma z_i^{(g)}$. Evaluate $y_i^{(g)}$, yielding $f(y_i^{(g)})$
+        		\STATE $y_i^{(g)} \leftarrow x_{\text{centroid}[i]}^{(g)} + \sigma z_i^{(g)}$. Evaluate $y_i^{(g)}$, yielding $f(y_i^{(g)})$ 
         	\ENDFOR
         	\STATE $Y^{(g)} \leftarrow \{y_i^{(g)}: i=1,2,...,\lambda\}$,  $fY^{(g)} \leftarrow \{f(y_i^{(g)}): i=1,2,...,\lambda\}$
         	\IF{comma-selection}                   
         		\STATE $X^{(g+1)} \leftarrow  select\_best
         		(\mu,Y^{(g)},fY^{(g)})$
-        		    \hfill$\blacktriangleright$\Comment{Selection} % comment
+        		    \hfill$\blacktriangleright$\Comment{Selection based on $f$} % comment
         	\ELSIF{plus-selection}
         		\STATE $X^{(g+1)} \leftarrow  select\_best (\mu,X^{(g)} \cup Y^{(g)},fX^{(g)} \cup fY^{(g)})$
-        		    \hfill$\blacktriangleright$\Comment{Selection} % comment
+        		    \hfill$\blacktriangleright$\Comment{Selection based on $f$} % comment
         	\ENDIF
         	\STATE Update step size $\sigma$, $g\leftarrow g+1$
         \ENDWHILE
@@ -204,7 +204,7 @@
         1/\mu \sum_{i=1}^\mu z_{i;\lambda}^{(g)}$ is the averaged direction of the best $\mu$ offspring selected.
         \item The step size is adapted 
             $$\sigma^{(g+1)} \leftarrow \sigma \exp \left (  \frac{c}{d}  \left( \frac{\Vert p^{(g+1)}\Vert}{E \Vert \mathcal{N}(0,I)\Vert } -1 \right) \right ),$$
-            detail refers to "The CMA Evolution Strategy: A Tutorial" []. 
+            details please refer to "The CMA Evolution Strategy: A Tutorial" 
     \end{itemize}
 
 \end{itemize}
@@ -250,12 +250,88 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 2.2 Surrogate model
 \subsection{Surrogate Model}
-
-% Start slides 
 \begin{frame}{2.2 Surrogate Model}
 
-
+\begin{itemize}
+    \item \textbf{Surrogate Models} 
+    \begin{itemize}
+        \item Are computational models constructed using data evaluated by the true objective function
+        \item Acts as an approximation to the true objective function (in most cases costly)
+    \end{itemize}
+    \item \textbf{Assumption}: the objective function value estimated by the surrogate model can be achieved at \textbf{vanishing cost}
+    \item \textbf{Types}: Gaussian Process (GP), Support Vector Machine (SVM),  Polynomial Regression (PR), and etc
+    \item We only focus on \textbf{GP surrogate model} that is used later
+    % \begin{itemize}
+    %     \item 
+    % \end{itemize}
+  
+    
+\end{itemize}
 \end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{2.2.1 GP Surrogate Model}
+
+\begin{itemize}
+    \item Given an unknown scalar function $f(x):\mathbb{R}^N \rightarrow \mathbb{R}$, training data $(X,f)$ with $X=\{x_i:i=1,2,...,n\}$ and $\ f = \{f(x_i):i=1,2,...,n \}$
+    \item Want to predict the function values $f_*$ of a test set $X_*$ with size $n_*$. 
+    \item \textbf{GP} is a probabilistic model that is completely determined
+    \begin{itemize}
+        \item the mean function $m(x)=E[f(x)]$, commonly assumed to be 0
+        \item a covariance function (a positive definite kernel) 
+        $$\kappa(x, x') = E[(f(x)-m(x))(f(x')-m(x '))],$$
+        where the distribution of the function value $f(x_i),i=1,2,...,n$ is jointly Gaussian with mean $\mu = \{m(x_i):,i=1,2,...,n\}$, and covariance matrix $\Signa$ with entry $\Sigma_{ij} = \kappa (x_i,x_j)$.
+        
+    \end{itemize}
+    \item Define the covariance between $x '$ and $x$ to be given by the smooth covariance function (squard exponetial)
+    $$\kappa(x, x ') = \text{exp} \left( - \frac{\|x - x' \|^2}{2 \theta^2} \right),$$
+    where $\theta$ is the length scale factor of the GP.
+    
+\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{2.2.1 GP Surrogate Model Cont}
+
+\begin{itemize}
+    \item The vector of known function values and the predicted value $(f,f_*)$ are jointly normally distributed with mean $(\mu,\mu_*)$ and covariance matrix
+        $$\begin{bmatrix} K & K_*\\ K_*^T&K_{**} \end{bmatrix},$$
+    where $K = \kappa(X,X),K_* = \kappa (X,X_*)$, and $K_{**} = (X_*,X_*)$. 
+    \item By Bayes' rule, $f_*$ is normally distributed with mean and covariance 
+       $$ \mu_* = K_*^T K^{-1}f \nonumber $$
+        $$\Sigma_* = K_{**}- K_*^TK^{-1}K_* $$
+    
+
+
+\end{itemize}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{2.2.2 Combination of ES and surrogate models}
+
+\begin{itemize}
+    \item \textbf{Types} 
+    \begin{itemize}
+        \item ES assisted by surrogate model
+        \item Surrogate model assisted ES
+    \end{itemize}
+    
+    
+    \item Surrogate model assisted (1+1)-ES proposed by Kayhani and Arnold 
+    \begin{itemize}
+        \item The \textbf{selection} is based on the inaccurate fitness estimated by the surrogate model rather than the true objective function
+        \item True objective functions calls are made iff. the estimated fitness of the offspring is superior to its parent
+        \item \textbf{Step size} is adapted according to the success rate where 
+            \begin{itemize}
+                \item The step size is decreased when $f_\epsilon(y)>f(x)$ or $f(y)>f(x)$
+                \item The step size is increased when $f(y)<f(x)$
+            \end{itemize}
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -303,6 +379,8 @@ where $z_\epsilon \sim \mathcal{N}(0,1), \sigma_\epsilon \in \mathbb{R}. $
         \eta = \frac{1}{1}E[ \delta_{GP}^*] \approx  \frac{\sigma^* c_{\mu / \mu, \lambda}}{\sqrt {1+ \vartheta^2}} - \frac{(\sigma^*)^2}{2 \mu} ,\nonumber 
     \end{align}
     where $\vartheta$ here illustrates the accuracy of the surrogate model, the true objective function call per generation is 1 instead of $\lambda$ in $(\mu/\mu,\lambda)$-ES.
+    
+    Details see 
 \end{itemize} 
 
 \end{frame}
@@ -376,14 +454,16 @@ where $z_\epsilon \sim \mathcal{N}(0,1), \sigma_\epsilon \in \mathbb{R}. $
         \STATE Initialize $c,d,E \left\lVert \mathcal{N}(0,I) \right\rVert,s^{(0)}$  using setting from Hansen [2]
         \WHILE{not terminate()} 
         	\FOR{$i=1,2,...,\lambda$}
-        		\STATE Generate standard normally distributed $z_i^{(g)} \in \mathbb{R}^N $
+        		\STATE Generate standard normally distributed $z_i^{(g)} \in \mathbb{R}^N $  \hfill$\blacktriangleright$\Comment{Mutation} % comment
         		\STATE Evaluate $x_{\text{centroid}}^{(g)} + \sigma^{(g)} z_i^{(g)}$ using the surrogate model, yielding $f_{\epsilon}(x_{\text{centroid}}^{(g)} + \sigma^{(g)} z_i)$
+        		
         	\ENDFOR
-        	\STATE $z_{\text{step}}^{(g)} \leftarrow \frac{1}{\mu}\sum_{i=1}^{\mu} z_{i;\lambda}^{(g)}$
-        	\STATE $x_{\text{centroid}}^{(g+1)} \leftarrow  x_{\text{centroid}}^{(g)} + \sigma^{(g)} z_{\text{step}}^{(g)}$ 
+        	\STATE $z_{\text{step}}^{(g)} \leftarrow \frac{1}{\mu}\sum_{i=1}^{\mu} z_{i;\lambda}^{(g)}$ \hfill \Comment{$\triangleright$Selection based on surrogate model} % comment
+        	\STATE $x_{\text{centroid}}^{(g+1)} \leftarrow  x_{\text{centroid}}^{(g)} + \sigma^{(g)} z_{\text{step}}^{(g)}$  
+        	\hfill$\blacktriangleright$\Comment{Recombination} % comment
         	\STATE Evaluate $x_{\text{centroid}}^{(g+1)}$ using true objective function, yieding $f(x_{\text{centroid}}^{(g+1)})$
         	\STATE Update surrogate model by adding $(x_{\text{centroid}}^{(g+1)},f(x_{\text{centroid}}^{(g+1)}))$
-        	\STATE $s^{(g)} \leftarrow (1-c)s + \sqrt{ c(2-c) \mu} z_{\text{step}}^{(g)}$
+        	\STATE $s^{(g)} \leftarrow (1-c)s + \sqrt{ c(2-c) \mu} z_{\text{step}}^{(g)}$  \hfill$\blacktriangleright$\Comment{Update step size using CSA} % comment
         	\STATE $\sigma^{(g+1)} \leftarrow \sigma^{(g)}  \text{exp} \left(\frac{c}{d} \frac{\left\lVert s^{(g)} \right\rVert} { E \left\lVert \mathcal{N}(0,I) \right\rVert} -1 \right )$
         	\STATE $g \leftarrow g + 1$
         \ENDWHILE
@@ -395,18 +475,64 @@ where $z_\epsilon \sim \mathcal{N}(0,1), \sigma_\epsilon \in \mathbb{R}. $
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{4.1.2 Experimental results}
+\begin{frame}{4.1.2 Experimental Results}
+
+\begin{itemize}
+    \item \textbf{A gap} between the expected performance and experimental results obtained 
+    \item The benefit of intensive sampling (use of larger population) not clear
+        \begin{itemize}
+            \item Improvements on quadratic sphere and quartic function
+            \itme Decline on linear sphere, cubic sphere, and Schwefel's function
+        \end{itemize}
+\end{itemize}
 
 \begin{figure}
 \includegraphics[width=1.0\linewidth]{tab-GP-mml-ES.pdf}
     \caption{Median test results and speed-ups of GP-$(\mu/\mu,\lambda)$-ES}
 \end{figure}
 
+
 \end{frame}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{4.1.3 Interpretation}
+\begin{frame}{4.1.3 Experimental Plots }
+\begin{figure}
+\includegraphics[width=1.0\linewidth]{merged_plot_NO_emergency_v4_final.pdf}
+    \caption{Median test results: function calls, convergence graph, $\sigma^*$, and $\vartheta$}
+\end{figure}
+\end{frame}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{4.1.3 Relative Model Error  }
+\begin{itemize}
+    \item Define the relative model error in generation $(g)$
+    $$\begin{cases}\frac{\|f(y^{(g)})-f_{\epsilon}(y^{(g)}) \|}{\|f(y)-f_(x) \|},\text{for surrogate model assisted (1+1)-ES} \\ \sqrt{\frac{ var(fY^{(g)}-fY_{\epsilon}^{(g)})}{var(fY^{(g)}-fX^{(g)})}},\text{for surrogate model assisted }(\mu/\mu,\lambda)\text{-ES},\end{cases}$$
+    interpreted as a constant noise-to-signal ratio for comparision in analysis.
+    \item The relative model error in quadratic sphere $\approx 0.7$
+        \begin{itemize}
+            \item The $\sigma^*$ obtained in experiment is within the range of opt. $\sigma^*$ in analysis for $\vartheta \approx 0.7$
+            \item The CSA seems to adapted the step size successfuly
+        \end{itemize}
+    \item \textbf{Issue}: a factor about 4 in $\text{speed-up}_{\text{model}}$ smaller than that of the results obtained in Analysis.
+    
+\end{itemize}
+\end{frame}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{4.1.4 Success Rate (of Good Steps)}
+\begin{itemize}
+    \item The step taken in each step determines how much we can gain  
+    \item Define 
+        \begin{itemize}
+            \item a good step to bring fitness gain
+            \item success rate, the proportion of good steps in a single run 
+        \end{itemize}
+    \item \textbf{Success rate} $\approx 0.47$
+\begin{figure}
+\includegraphics[width=1.0\linewidth]{success_NO_emergency_v3_final.pdf}
+    \caption{Histograms of the success rate (proportion of good steps in a single run)for each test function using (1+1)-ES and GP-$(\mu/\mu,\lambda)$-ES with $\lambda$ = 10, 20, 40.}
+\end{figure}
+\end{itemize}
 \end{frame}
 
 
@@ -418,9 +544,9 @@ where $z_\epsilon \sim \mathcal{N}(0,1), \sigma_\epsilon \in \mathbb{R}. $
 \begin{itemize}
     \item The GP-$(\mu/\mu,\lambda)$-ES gives a success rate approximately equals to 0.5 for all population sizes used in all test functions
     \item How much to benefit if we can avoid or simply reject those bad steps
-    \item A recent paper in surrogate model assisted ES considers (1+1)-ES where the step size is successfully adapted based on the success rate
-    \begin{itemize}
+    \item A recent paper in surrogate model assisted ES considers (1+1)-ES where the step size is successfully adapted based on the success rate 
         \item The step size is decreased if $f_\epsilon(y)>f(x)$ or $f(y)>f(x)$
+    \begin{itemize}
     \end{itemize}
     \item Apply the same idea, propose a surrogate model assisted ES that is a cross between (1+1)-ES and $(\mu/\mu,\lambda)$-ES ( referred to as GP-cross-ES)
         \begin{itemize}
@@ -440,18 +566,22 @@ where $z_\epsilon \sim \mathcal{N}(0,1), \sigma_\epsilon \in \mathbb{R}. $
         \STATE Initialize $c,d,E \left\lVert \mathcal{N}(0,I) \right\rVert,s^{(0)}$  using setting from Hansen [2], $D \leftarrow 0.72$
        \WHILE{not terminate()} 
     	\FOR{$i=1,2,...,\lambda$}
-    		\STATE Generate standard normally distributed $z_i^{(g)} \in \mathbb{R}^N $
+    		\STATE Generate standard normally distributed $z_i^{(g)} \in \mathbb{R}^N $ 
+    		\hfill$\blacktriangleright$\Comment{Mutation} % comment
     		% \STATE $y_i^{(g)} \leftarrow x_{\text{centroid}}^{(g)} + \sigma^{(g)} z_i$
     		\STATE Evaluate $x_{\text{centroid}}+ \sigma^{(g)} z_i^{(g)}$ using the surrogate model, yielding $f_{\epsilon}(x_{\text{centroid}} + \sigma^{(g)} z_i^{(g)})$
     	\ENDFOR
-    	\STATE $z_{\text{step}}^{(g)} \leftarrow \frac{1}{\mu}\sum_{i=1}^{\mu} z_{i;\lambda}^{(g)}$
+    	\STATE $z_{\text{step}}^{(g)} \leftarrow \frac{1}{\mu}\sum_{i=1}^{\mu} z_{i;\lambda}^{(g)}$   
+    	\hfill \Comment{$\blacktriangleright$Selection based on surrogate model} % comment
     	\STATE $y  \leftarrow  x_{\text{centroid}} + \sigma^{(g)} z_{\text{step}}^{(g)}$ 
+    	\hfill$\blacktriangleright$\Comment{Recombination} % comment
     	\STATE Evaluate $y$ using true objective function, yielding $f(y)$
     	\STATE Update surrogate model by adding $(y,f(y))$
     	\IF{$f(x_{\text{centroid}}) < f(y)$ (occurrence of a bad step)}
     		\STATE $\sigma \leftarrow \sigma D$
+    		\hfill\Comment{$\triangleright$Decrease step size} % comment
     	\ELSE
-    		\STATE $ x_{\text{centroid}} \leftarrow y $. Update $s^{(g)},\sigma^{(g+1)}$ using CSA \hfill$\blacktriangleright$\Comment{plus-selection} % comment
+    		\STATE $ x_{\text{centroid}} \leftarrow y $. Update $s^{(g)},\sigma^{(g+1)}$ using CSA \hfill\Comment{$\triangleright$Plus-selection, update step size using CSA} % comment
     	\ENDIF
     	\STATE $g \leftarrow g + 1$
     \ENDWHILE
@@ -462,8 +592,14 @@ where $z_\epsilon \sim \mathcal{N}(0,1), \sigma_\epsilon \in \mathbb{R}. $
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{4.2.2 Experimental results}
-
+\begin{frame}{4.2.2 Experimental Results}
+\begin{itemize}
+    \item Overall performance of GP-cross-ES improves as the population size increases 
+    \item The benefit of using larger population size and intensive sampling 
+    \begin{itemize}
+        \item Outperforms the surrogate model assisted (1+1)-ES in all test functions after $\lambda\geq 20$ with $\text{speed-up}_{\text{model}}$ approximately between 1.3 and 1.6. 
+    \end{itemize}
+\end{itemize}
 \begin{figure}
 \includegraphics[width=1.0\linewidth]{tab-GP-cross-ES.pdf}
     \caption{Median test results and speed-ups of GP-cross-ES}
@@ -473,8 +609,32 @@ where $z_\epsilon \sim \mathcal{N}(0,1), \sigma_\epsilon \in \mathbb{R}. $
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{4.2.3 Interpretation}
+\begin{frame}{4.2.3 Experimental Plots}
+\begin{figure}
+\includegraphics[width=1.0\linewidth]{merged_plot_emergency_v4_final.pdf}
+    \caption{Median test results: function calls, convergence graph, $\sigma^*$, and $\vartheta$}
+\end{figure}
+\end{frame}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{4.2.4 Interpretation}
+\begin{itemize}
+    \item Interpret better performance with growing $\lambda$ from two aspects
+    \item Plus-selection  
+        \begin{itemize}
+            \item Reject bad steps, proceed only if there is fitness gain
+            \item Even if success rate decreases as $\lambda$ increases, it accepts steps with potentially better quality (compared with steps obtained using a small $\lambda$)
+            \item Loses the benefit of the larger step size compared with comma-selection
+        \end{itemize}
+    \item Step size behaviour
+    \begin{itemize}
+            \item Potential better step quality with larger $\lambda$
+            
+            Continuous occurrence of bad step results in continuous decreases of $\sigma^*$ (first 80 generations in linear sphere for GP-cross-ES with $\lambda=10,\mu=3$) 
+            \item Occurrences and duration of continuous decreases in $\sigma^*$ reduces as $\lambda$ increases
+    \end{itemize}
+    
+\end{itemize}
 
 \end{frame}
 
@@ -527,8 +687,21 @@ where $z_\epsilon \sim \mathcal{N}(0,1), \sigma_\epsilon \in \mathbb{R}. $
   \end{itemize}
   
 \end{frame}
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% 6. References
+\section{Questions}
+\begin{frame}[plain,c]
+%\frametitle{A first slide}
+\begin{center}
+\Huge 6. Questions
+\end{center}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 7. References
 \begin{frame}{References}
 %   \begin{itemize}
 %   \item
