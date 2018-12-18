@@ -143,6 +143,7 @@
 \begin{frame}{2.1.1 Evolution Strategy}
 \begin{itemize}
     \item \textbf{Mutation}  
+    \\
     % Generate standard normally distributed 
     \item \textbf{Recombination}
     
@@ -405,7 +406,7 @@ where $z_\epsilon \sim \mathcal{N}(0,1), \sigma_\epsilon \in \mathbb{R}. $
         \item $\text{speed-up}_{\text{model}}$: number of objective function calls used for surrogate model assisted (1+1)-ES divided by that of the surrogate model assisted $(\mu/\mu,\lambda)$-ES
     \end{itemize}     
     \item \textbf{Ideally}, $\text{speed-up}_{\text{self}} \overset{N\rightarrow\infty}{\rightarrow} \lambda$ as the surrogate model models the objective function exactly
-    \item \textbf{In reality}, the  $\text{speed-up}_{\text{self}}$ degrades as $\varther$ increases. 
+    \item \textbf{In reality}, the  $\text{speed-up}_{\text{self}}$ degrades as $\vartheta$ increases. 
     
     When $N=10$, $\text{speed-up}_{\text{model}}$ is 2.4, 3.7, 4.7 for $(3/3,10)$-ES, $(5/5,20)$-ES, and $(10/10,40)$-ES respectively. 
     \item Overall the surrogate model assisted $(\mu/\mu,\lambda)$-ES achieves a larger opt. expected gain at a larger normalized step size relative to the surrogate model assisted (1+1)-ES. 
@@ -481,8 +482,8 @@ where $z_\epsilon \sim \mathcal{N}(0,1), \sigma_\epsilon \in \mathbb{R}. $
     \item \textbf{A gap} between the expected performance and experimental results obtained 
     \item The benefit of intensive sampling (use of larger population) not clear
         \begin{itemize}
-            \item Improvements on quadratic sphere and quartic function
-            \itme Decline on linear sphere, cubic sphere, and Schwefel's function
+            \item Improvements on the quadratic sphere and quartic function
+            \item Declines on linear sphere, cubic sphere, and Schwefel's function
         \end{itemize}
 \end{itemize}
 
@@ -496,19 +497,20 @@ where $z_\epsilon \sim \mathcal{N}(0,1), \sigma_\epsilon \in \mathbb{R}. $
 
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{4.1.3 Experimental Plots }
+\qquad Linear \qquad Quadratic \qquad Cubic sphere\ \ \ Schwefel \ \  Quartic function
 \begin{figure}
 \includegraphics[width=1.0\linewidth]{merged_plot_NO_emergency_v4_final.pdf}
-    \caption{Median test results: function calls, convergence graph, $\sigma^*$, and $\vartheta$}
+    % \caption{Median test results}
 \end{figure}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{4.1.3 Relative Model Error  }
 \begin{itemize}
-    \item Define the relative model error in generation $(g)$
+    \item Define the relative model error in generation $(g)$ as
     $$\begin{cases}\frac{\|f(y^{(g)})-f_{\epsilon}(y^{(g)}) \|}{\|f(y)-f_(x) \|},\text{for surrogate model assisted (1+1)-ES} \\ \sqrt{\frac{ var(fY^{(g)}-fY_{\epsilon}^{(g)})}{var(fY^{(g)}-fX^{(g)})}},\text{for surrogate model assisted }(\mu/\mu,\lambda)\text{-ES},\end{cases}$$
-    interpreted as a constant noise-to-signal ratio for comparision in analysis.
-    \item The relative model error in quadratic sphere $\approx 0.7$
+    interpreted as a constant noise-to-signal ratio for comparison in analysis.
+    \item The relative model error for the quadratic sphere $\approx 0.7$
         \begin{itemize}
             \item The $\sigma^*$ obtained in experiment is within the range of opt. $\sigma^*$ in analysis for $\vartheta \approx 0.7$
             \item The CSA seems to adapted the step size successfuly
@@ -521,11 +523,10 @@ where $z_\epsilon \sim \mathcal{N}(0,1), \sigma_\epsilon \in \mathbb{R}. $
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{4.1.4 Success Rate (of Good Steps)}
 \begin{itemize}
-    \item The step taken in each step determines how much we can gain  
-    \item Define 
+    \item The step taken in each step determines how much the strategy is to perform. So define 
         \begin{itemize}
-            \item a good step to bring fitness gain
-            \item success rate, the proportion of good steps in a single run 
+            \item a \textbf{good step} to be a step that brings fitness gain
+            \item the \textbf{success rate} as the proportion of good steps in a single run 
         \end{itemize}
     \item \textbf{Success rate} $\approx 0.47$
 \begin{figure}
@@ -581,7 +582,7 @@ where $z_\epsilon \sim \mathcal{N}(0,1), \sigma_\epsilon \in \mathbb{R}. $
     		\STATE $\sigma \leftarrow \sigma D$
     		\hfill\Comment{$\triangleright$Decrease step size} % comment
     	\ELSE
-    		\STATE $ x_{\text{centroid}} \leftarrow y $. Update $s^{(g)},\sigma^{(g+1)}$ using CSA \hfill\Comment{$\triangleright$Plus-selection, update step size using CSA} % comment
+    		\STATE $ x_{\text{centroid}} \leftarrow y $. Update $s^{(g)},\sigma^{(g+1)}$ using CSA \hfill\Comment{$\triangleright$Plus-selection, CSA} % comment
     	\ENDIF
     	\STATE $g \leftarrow g + 1$
     \ENDWHILE
@@ -595,7 +596,7 @@ where $z_\epsilon \sim \mathcal{N}(0,1), \sigma_\epsilon \in \mathbb{R}. $
 \begin{frame}{4.2.2 Experimental Results}
 \begin{itemize}
     \item Overall performance of GP-cross-ES improves as the population size increases 
-    \item The benefit of using larger population size and intensive sampling 
+    \item The benefit of using larger population sizes and intensive sampling 
     \begin{itemize}
         \item Outperforms the surrogate model assisted (1+1)-ES in all test functions after $\lambda\geq 20$ with $\text{speed-up}_{\text{model}}$ approximately between 1.3 and 1.6. 
     \end{itemize}
@@ -610,6 +611,7 @@ where $z_\epsilon \sim \mathcal{N}(0,1), \sigma_\epsilon \in \mathbb{R}. $
 
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{4.2.3 Experimental Plots}
+\qquad Linear \qquad Quadratic \qquad Cubic sphere\ \ \ Schwefel \ \  Quartic function
 \begin{figure}
 \includegraphics[width=1.0\linewidth]{merged_plot_emergency_v4_final.pdf}
     \caption{Median test results: function calls, convergence graph, $\sigma^*$, and $\vartheta$}
@@ -620,21 +622,25 @@ where $z_\epsilon \sim \mathcal{N}(0,1), \sigma_\epsilon \in \mathbb{R}. $
 \begin{frame}{4.2.4 Interpretation}
 \begin{itemize}
     \item Interpret better performance with growing $\lambda$ from two aspects
-    \item Plus-selection  
+    \item \textbf{Plus-selection }
         \begin{itemize}
             \item Reject bad steps, proceed only if there is fitness gain
-            \item Even if success rate decreases as $\lambda$ increases, it accepts steps with potentially better quality (compared with steps obtained using a small $\lambda$)
+            \item Even if success rate decreases as $\lambda$ increases, it accepts steps with potentially better quality (compared with that of using a small $\lambda$)
             \item Loses the benefit of the larger step size compared with comma-selection
         \end{itemize}
-    \item Step size behaviour
+    \item \textbf{Step size behaviour}
     \begin{itemize}
             \item Potential better step quality with larger $\lambda$
             
-            Continuous occurrence of bad step results in continuous decreases of $\sigma^*$ (first 80 generations in linear sphere for GP-cross-ES with $\lambda=10,\mu=3$) 
+            Continuous occurrence of bad step results in continuous decreases of $\sigma^*$ (see the normalized step size in quadratic sphere below) 
             \item Occurrences and duration of continuous decreases in $\sigma^*$ reduces as $\lambda$ increases
+            \begin{figure}
+            \includegraphics[width=0.405\linewidth]{normalized_step_emergency.pdf}
+            \end{figure}
     \end{itemize}
     
 \end{itemize}
+
 
 \end{frame}
 
@@ -703,50 +709,64 @@ where $z_\epsilon \sim \mathcal{N}(0,1), \sigma_\epsilon \in \mathbb{R}. $
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 7. References
 \begin{frame}{References}
-%   \begin{itemize}
-%   \item
-%     Study the behaviours of the surrogate assisted CMA-ES using the same simple model that potentially help handle ill-conditioned problems
-%   \item
-%     Future goals includes 
-%     \begin{itemize}
-%         \item Understanding the effect of length scale parameter in the Gaussian Process model 
-%         \item Potential length scale adaptation mechanism
-%         \item Surrogate accuracy control
-%     \end{itemize}
+\begin{thebibliography}{10}
 
-%   \end{itemize}
-  
+    \bibitem{}
+    A. Kayhani and D. V. Arnold.Design of a surrogate model assisted (1 + 1)-ES.
+    \newblock { {\em Parallel Problem Solving from Nature} - PPSN XV - 15th
+International Conference, Coimbra, Portugal, September 8-12, 2018, Proceedings, Part I, 16–28},
+    
+    \bibitem{}
+    D. V. Arnold N. Hansen and A. Auger. Evolution strategies
+    \newblock { {\em Springer Handbook of Computational Intelligence.} Springer, 871–898.},
+    
+    \bibitem{}
+    D. V. Arnold and H.-G. Beyer. Efficiency and mutation strength adaptation of the ($\mu/\mu,\lambda$)-ES in a noisy environment.
+    \newblock { {\em Proceedings of the 6th International Conference on Parallel Problem Solving from Nature (PPSN VI).} Springer-Verlag, London, UK, 39–48.},
+    
+    \bibitem{}
+    C. E. Rasmussen. Gaussian processes in machine learning.
+    \newblock { {\em Advanced Lectures on Machine Learning.} Springer, 63–71}
+    
+%     \bibitem{}
+%   D. V. Arnold and H.-G. Beyer. Local performance of the ($\mu/\mu,\lambda$)-ES in a noisy environment.
+%     \newblock { {\em Foundations of Genetic Algorithms} Morgan Kaufmann, San Francisco, 127–141}
+    
+    
+    \end{thebibliography}
+
+
 \end{frame}
 
 % All of the following is optional and typically not needed. 
-\appendix
-\section<presentation>*{\appendixname}
-\subsection<presentation>*{References}
+% \appendix
+% \section<presentation>*{\appendixname}
+% \subsection<presentation>*{References}
 
-\begin{frame}[allowframebreaks]
-  \frametitle<presentation>{For Further Reading}
+% \begin{frame}[allowframebreaks]
+%   \frametitle<presentation>{For Further Reading}
     
-  \begin{thebibliography}{10}
+%   \begin{thebibliography}{10}
     
-  \beamertemplatebookbibitems
-  % Start with overview books.
+%   \beamertemplatebookbibitems
+%   % Start with overview books.
 
-  \bibitem{Author1990}
-    A.~Author.
-    \newblock {\em Handbook of Everything}.
-    \newblock Some Press, 1990.
+%   \bibitem{Author1990}
+%     A.~Author.
+%     \newblock {\em Handbook of Everything}.
+%     \newblock Some Press, 1990.
  
     
-  \beamertemplatearticlebibitems
-  % Followed by interesting articles. Keep the list short. 
+%   \beamertemplatearticlebibitems
+%   % Followed by interesting articles. Keep the list short. 
 
-  \bibitem{Someone2000}
-    S.~Someone.
-    \newblock On this and that.
-    \newblock {\em Journal of This and That}, 2(1):50--100,
-    2000.
-  \end{thebibliography}
-\end{frame}
+%   \bibitem{Someone2000}
+%     S.~Someone.
+%     \newblock On this and that.
+%     \newblock {\em Journal of This and That}, 2(1):50--100,
+%     2000.
+%   \end{thebibliography}
+% \end{frame}
 
 
 
